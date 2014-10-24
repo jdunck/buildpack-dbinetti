@@ -47,7 +47,8 @@ cd /app
 #  ./b2 --prefix=/app/.heroku/vendor/ install
 #fi
 
-cp /app/vendor/vendor-boost.tar.gz /app/.heroku/vendor/
+ROOT_DIR=$(dirname $BIN_DIR)
+cp ${ROOT_DIR}/vendor/vendor-boost.tar.gz /app/.heroku/vendor/
 cd /app/.heroku/vendor/
 tar --extract  --strip-components=3 -f vendor.tar.gz
 
