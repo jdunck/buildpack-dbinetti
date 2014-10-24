@@ -1,5 +1,4 @@
 # Install Mercurial if it appears to be required.
- at app layer: config:set LD_LIBRARY_PATH=/app/.dbinetti/boost-prefix/lib/:/app/.dbinetti/lib/
 
 mkdir -p .dbinetti
 mkdir .profile.d
