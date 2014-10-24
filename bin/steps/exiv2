@@ -21,6 +21,7 @@ export PYEXIV2_ARCHIVE=${PYEXIV2_FILENAME}.tar.bz2
 
 bpwatch start exiv2_install
 if [ ! -f $CACHE_DIR/${EXIV2_ARCHIVE} ]; then
+  echo "building exiv2"
   cd $CACHE_DIR
   curl http://www.exiv2.org/${EXIV2_ARCHIVE} > ${EXIV2_ARCHIVE}
 
@@ -32,19 +33,28 @@ fi
 
 cd /app
 
-if [ ! -f $CACHE_DIR/${BOOST_ARCHIVE} ]; then
-  cd $CACHE_DIR
-  curl -L $BOOST_URL > ${BOOST_ARCHIVE}
+# Boost takes forever to build, causing heroku
+# to time out the pack build.
+# So instead of compiling raw, we'll  unpack a vendored version.
+#if [ ! -f $CACHE_DIR/${BOOST_ARCHIVE} ]; then
+#  echo "building boost"
+#  cd $CACHE_DIR
+#  curl -L $BOOST_URL > ${BOOST_ARCHIVE}
+#
+#  tar xfj $BOOST_ARCHIVE
+#  cd $BOOST_FILENAME
+#  ./bootstrap.sh
+#  ./b2 --prefix=/app/.heroku/vendor/ install
+#fi
 
-  tar xfj $BOOST_ARCHIVE
-  cd $BOOST_FILENAME
-  ./bootstrap.sh
-  ./b2 --prefix=/app/.heroku/vendor/ install
-fi
+cp /app/vendor/vendor-boost.tar.gz /app/.heroku/vendor/
+cd /app/.heroku/vendor/
+tar --extract  --strip-components=3 -f vendor.tar.gz
 
 cd /app
 
 if [! -f $CACHE_DIR/${PYEXIV2_ARCHIVE} ]; then
+  echo "building pyexiv2"
   /app/.heroku/python/bin/pip install --egg scons
 
   cd $CACHE_DIR
