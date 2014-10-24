@@ -19,6 +19,14 @@ export PYEXIV2_VERSION=0.3.2
 export PYEXIV2_FILENAME=pyexiv2-${PYEXIV2_VERSION}
 export PYEXIV2_ARCHIVE=${PYEXIV2_FILENAME}.tar.bz2
 
+echo "bin $BIN_DIR"
+ROOT_DIR=$(dirname $BIN_DIR)
+echo "root $ROOT_DIR"
+cp ${ROOT_DIR}/vendor/vendor-boost.tar.gz /app/.heroku/vendor/
+cd /app/.heroku/vendor/
+tar --extract  --strip-components=3 -f vendor.tar.gz
+
+
 bpwatch start exiv2_install
 if [ ! -f $CACHE_DIR/${EXIV2_ARCHIVE} ]; then
   echo "building exiv2"
@@ -47,10 +55,7 @@ cd /app
 #  ./b2 --prefix=/app/.heroku/vendor/ install
 #fi
 
-ROOT_DIR=$(dirname $BIN_DIR)
-cp ${ROOT_DIR}/vendor/vendor-boost.tar.gz /app/.heroku/vendor/
-cd /app/.heroku/vendor/
-tar --extract  --strip-components=3 -f vendor.tar.gz
+#>>>>
 
 cd /app
 
