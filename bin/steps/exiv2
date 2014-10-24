@@ -1,0 +1,62 @@
+# Install Mercurial if it appears to be required.
+ at app layer: config:set LD_LIBRARY_PATH=/app/.dbinetti/boost-prefix/lib/:/app/.dbinetti/lib/
+
+mkdir -p .dbinetti
+mkdir .profile.d
+
+echo 'LD_LIBRARY_PATH=/app/.dbinetti/boost-prefix/lib/:/app/.dbinetti/lib/:$LD_LIBRARY_PATH' > .profile.d/exiv2.sh
+
+export EXIV2_VERSION=0.24
+export EXIV2_FILENAME=exiv2-${EXIV2_VERSION}
+export EXIV2_ARCHIVE=${EXIV2_FILENAME}.tar.gz
+
+export BOOST_VERSION=1.56.0
+export BOOST_FILE_VERSION=1_56_0
+export BOOST_FILENAME=boost_${BOOST_FILE_VERSION}
+export BOOST_ARCHIVE=${BOOST_FILENAME}.tar.bz2
+export BOOST_URL=http://downloads.sourceforge.net/project/boost/boost/${BOOST_VERSION}/${BOOST_ARCHIVE}
+
+export PYEXIV2_VERSION=0.3.2
+export PYEXIV2_FILENAME=pyexiv2-${PYEXIV2_VERSION}
+export PYEXIV2_ARCHIVE=${PYEXIV2_FILENAME}.tar.bz2
+
+bpwatch start exiv2_install
+if [ ! -f $CACHE_DIR/${EXIV2_ARCHIVE} ]; then
+  cd $CACHE_DIR
+  curl http://www.exiv2.org/${EXIV2_ARCHIVE} > ${EXIV2_ARCHIVE}
+
+  tar xfz $EXIV2_ARCHIVE
+  cd $EXIV2_FILENAME
+  ./configure --prefix=/app/.heroku/vendor/
+  make install
+fi
+
+cd /app
+
+if [ ! -f $CACHE_DIR/${BOOST_ARCHIVE} ]; then
+  cd $CACHE_DIR
+  curl -L $BOOST_URL > ${BOOST_ARCHIVE}
+
+  tar xfj $BOOST_ARCHIVE
+  cd $BOOST_FILENAME
+  ./bootstrap.sh
+  ./b2 --prefix=/app/.heroku/vendor/ install
+fi
+
+cd /app
+
+if [! -f $CACHE_DIR/${PYEXIV2_ARCHIVE} ]; then
+  /app/.heroku/python/bin/pip install --egg scons
+
+  cd $CACHE_DIR
+  curl -L "http://launchpad.net/pyexiv2/0.3.x/${PYEXIV2_VERSION}/+download/${PYEXIV2_ARCHIVE}" > ${PYEXIV2_ARCHIVE}
+
+  tar xfj $PYEXIV2_ARCHIVE
+  cd $PYEXIV2_FILENAME
+
+  echo "env.Append(CPPPATH=['/app/.heroku/vendor/include'])" >> src/SConscript
+  
+  export LDFLAGS='-L/app/.heroku/vendor/lib'
+  scons install
+fi
+bpwatch stop exiv2_install

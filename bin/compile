@@ -147,6 +147,9 @@ set -e
 
 mkdir -p $(dirname $PROFILE_PATH)
 
+echo 'LD_LIBRARY_PATH=/app/.heroku/vendor/lib/:$LD_LIBRARY_PATH' >> $(dirname $PROFILE_PATH)/exiv2.sh
+echo 'LDFLAGS="-L/app/.heroku/vendor/lib"' >> $(dirname $PROFILE_PATH)/exiv2.sh
+
 # Install Python.
 source $BIN_DIR/steps/python
 
@@ -158,6 +161,9 @@ source $BIN_DIR/steps/pip-uninstall
 
 # Mercurial support.
 source $BIN_DIR/steps/mercurial
+
+# exiv2
+source $BIN_DIR/steps/exiv2
 
 # Pylibmc support.
 source $BIN_DIR/steps/pylibmc
